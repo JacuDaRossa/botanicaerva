@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Botânica Oculta — Herbário de Paracelso</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Cinzel:wght@400;500;600&display=swap');
+
+  :root{
+    --parchment: #ece2c6;
+    --parchment-dark: #ddcd9d;
+    --ink: #2b2014;
+    --ink-soft: #4a3c26;
+    --umber: #6b4423;
+    --umber-deep: #3d2914;
+    --gold: #9c7a2e;
+    --gold-bright: #c9a227;
+    --verdigris: #4f6b54;
+    --blood: #6e2a1f;
+    --rule: rgba(43,32,20,0.28);
+    --shadow: rgba(20,14,6,0.35);
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background-color: var(--parchment);
+    background-image:
+      radial-gradient(ellipse at 15% 8%, rgba(155,120,50,0.16), transparent 45%),
+      radial-gradient(ellipse at 88% 92%, rgba(110,42,31,0.12), transparent 50%),
+      repeating-linear-gradient(0deg, rgba(75,55,25,0.025) 0px, rgba(75,55,25,0.025) 1px, transparent 1px, transparent 3px);
+    color: var(--ink);
+    font-family: 'EB Garamond', serif;
+    min-height: 100vh;
+  }
+
+  /* textura de papel via noise svg */
+  body::before{
+    content:"";
+    position: fixed; inset:0;
+    pointer-events:none;
+    opacity:0.5;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    z-index: 0;
+  }
+
+  .vignette{
+    position: fixed; inset:0; pointer-events:none; z-index:1;
+    box-shadow: inset 0 0 18vw rgba(20,14,6,0.32);
+  }
+
+  a{ color: var(--umber); }
+
+  /* ===== Cabeçalho ===== */
+  header.masthead{
+    position: relative;
+    z-index: 2;
+    padding: 3.2rem 1.5rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid var(--rule);
+  }
+  .sigil{
+    width: 64px; height: 64px;
+    margin: 0 auto 0.8rem;
+    opacity: 0.92;
+  }
+  .eyebrow{
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.32em;
+    font-size: 0.68rem;
+    color: var(--umber);
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+  h1.title{
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    margin: 0;
+    letter-spacing: 0.01em;
+    color: var(--umber-deep);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.25);
+  }
+  h1.title em{
+    font-style: italic;
+    color: var(--blood);
+  }
+  .subtitle{
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+    margin-top: 0.5rem;
+    letter-spacing: 0.02em;
+  }
+  .attribution{
+    margin-top: 1.1rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  /* ===== Busca ===== */
+  .search-wrap{
+    position: relative;
+    z-index: 5;
+    max-width: 680px;
+    margin: -1.4rem auto 0;
+    padding: 0 1.5rem;
+  }
+  .search-box{
+    position: relative;
+    background: linear-gradient(180deg, #f4ecd2, #e9dcb0);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    box-shadow: 0 10px 28px var(--shadow), inset 0 0 0 1px rgba(255,255,255,0.35);
+    padding: 0.2rem;
+  }
+  .search-box input{
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-style: italic;
+    color: var(--ink);
+    padding: 0.85rem 1.1rem 0.85rem 3rem;
+  }
+  .search-box input::placeholder{ color: rgba(43,32,20,0.45); }
+  .search-icon{
+    position:absolute; left: 1rem; top: 50%; transform: translateY(-50%);
+    width: 20px; height: 20px; opacity: 0.55;
+  }
+  .result-count{
+    text-align:center;
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-top: 0.7rem;
+    opacity: 0.75;
+  }
+
+  /* ===== Filtros ===== */
+  .filters{
+    max-width: 980px;
+    margin: 1.6rem auto 0;
+    padding: 0 1.5rem;
+    position: relative;
+    z-index: 4;
+  }
+  .filter-row{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content:center;
+    margin-bottom: 0.55rem;
+  }
+  .filter-label{
+    font-family:'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    width: 100%;
+    text-align: center;
+    margin-bottom: 0.3rem;
+    margin-top: 0.5rem;
+  }
+  .chip{
+    font-family: 'EB Garamond', serif;
+    font-size: 0.88rem;
+    padding: 0.32rem 0.85rem;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: rgba(244,236,210,0.5);
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display:flex; align-items:center; gap:0.35rem;
+    user-select:none;
+  }
+  .chip:hover{ background: rgba(244,236,210,0.95); border-color: var(--gold); }
+  .chip.active{
+    background: var(--umber-deep);
+    color: var(--parchment);
+    border-color: var(--umber-deep);
+  }
+  .chip .glyph{ font-size: 1rem; line-height:1; }
+
+  /* ===== Grade de plantas ===== */
+  main{
+    position: relative;
+    z-index: 2;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2.2rem 1.5rem 5rem;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.1rem;
+  }
+  .card{
+    background: linear-gradient(165deg, #f3ead0, #e6d8a9);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 1.3rem 1.2rem 1.1rem;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 3px 10px rgba(20,14,6,0.12);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .card::before{
+    content:"";
+    position:absolute; top:6px; left:6px; right:6px; bottom:6px;
+    border: 1px solid rgba(43,32,20,0.14);
+    pointer-events:none;
+  }
+  .card:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(20,14,6,0.22);
+  }
+  .card-top{
+    display:flex; justify-content: space-between; align-items:flex-start;
+    margin-bottom: 0.5rem;
+  }
+  .card-name{
+    font-family:'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 1.32rem;
+    color: var(--umber-deep);
+    line-height:1.15;
+  }
+  .card-sci{
+    font-style: italic;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    opacity: 0.8;
+    margin-top: 0.15rem;
+  }
+  .card-glyphs{
+    display:flex; gap:0.3rem; flex-shrink:0; margin-left:0.5rem;
+  }
+  .glyph-badge{
+    width:24px; height:24px;
+    border-radius:50%;
+    border: 1px solid var(--rule);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 0.85rem;
+    background: rgba(255,255,255,0.25);
+    color: var(--umber);
+  }
+  .card-snippet{
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    margin-top: 0.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-snippet b{ color: var(--blood); font-weight: 600; }
+  .card-foot{
+    margin-top: 0.7rem;
+    padding-top: 0.55rem;
+    border-top: 1px dashed var(--rule);
+    font-family:'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display:flex; justify-content: space-between;
+  }
+  .no-results{
+    text-align:center;
+    padding: 4rem 1rem;
+    font-family:'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--ink-soft);
+  }
+
+  /* ===== Modal ===== */
+  .overlay{
+    position: fixed; inset:0;
+    background: rgba(20,14,6,0.55);
+    backdrop-filter: blur(2px);
+    z-index: 50;
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    overflow-y:auto;
+    padding: 3vh 1rem 5vh;
+  }
+  .overlay.open{ display:flex; }
+  .modal{
+    background: linear-gradient(170deg, #f6efd9, #e9dba9);
+    max-width: 680px;
+    width: 100%;
+    border-radius: 3px;
+    border: 1px solid var(--rule);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+    position: relative;
+    padding: 2.4rem 2.2rem 2.2rem;
+  }
+  .modal::before{
+    content:"";
+    position:absolute; top:10px; left:10px; right:10px; bottom:10px;
+    border: 1px solid rgba(43,32,20,0.16);
+    pointer-events:none;
+  }
+  .modal-close{
+    position:absolute; top:1rem; right:1.1rem;
+    width: 34px; height:34px;
+    border-radius: 50%;
+    border: 1px solid var(--rule);
+    background: rgba(255,255,255,0.3);
+    cursor:pointer;
+    font-size: 1.2rem;
+    color: var(--ink-soft);
+    line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    transition: background 0.15s;
+  }
+  .modal-close:hover{ background: rgba(255,255,255,0.7); }
+  .modal-head{ margin-bottom: 1.3rem; padding-right: 2rem;}
+  .modal-name{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:700;
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    color: var(--umber-deep);
+    line-height:1.05;
+  }
+  .modal-sci{
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    margin-top: 0.25rem;
+  }
+  .modal-tags{
+    display:flex; gap:0.5rem; flex-wrap:wrap;
+    margin-top: 0.8rem;
+  }
+  .tag{
+    font-family:'Cinzel', serif;
+    font-size:0.62rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    padding: 0.28rem 0.65rem;
+    border-radius: 999px;
+    border:1px solid var(--rule);
+    background: rgba(255,255,255,0.35);
+    color: var(--ink-soft);
+    display:flex; align-items:center; gap:0.3rem;
+  }
+  .tag .glyph{ font-size:0.95rem; }
+  .modal-section{
+    margin-top: 1.4rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--rule);
+  }
+  .modal-section:first-of-type{ border-top:none; margin-top: 1.6rem; padding-top:0; }
+  .section-label{
+    font-family:'Cinzel', serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--blood);
+    margin-bottom: 0.5rem;
+    display:flex; align-items:center; gap:0.5rem;
+  }
+  .section-label .rule{
+    flex:1;
+    height:1px;
+    background: var(--rule);
+  }
+  .section-label.oculto{ color: var(--verdigris); }
+  .section-text{
+    font-size: 1.04rem;
+    line-height: 1.62;
+    color: var(--ink);
+  }
+  .empty-note{
+    font-style: italic;
+    opacity: 0.6;
+    font-size: 0.95rem;
+  }
+  .modal-meta-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
+    gap: 0.8rem;
+    margin-top: 1.4rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--rule);
+  }
+  .meta-item .meta-label{
+    font-family:'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color: var(--gold);
+    margin-bottom: 0.2rem;
+  }
+  .meta-item .meta-value{
+    font-size: 0.96rem;
+    color: var(--ink-soft);
+  }
+
+  /* ===== Rodapé ===== */
+  footer{
+    text-align:center;
+    padding: 2.5rem 1.5rem 3rem;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    opacity: 0.7;
+    position: relative; z-index: 2;
+    border-top: 1px solid var(--rule);
+  }
+  footer .ornament{ font-size: 1.3rem; color: var(--gold); margin-bottom: 0.5rem; letter-spacing: 0.5em;}
+
+  @media (max-width: 560px){
+    .modal{ padding: 2rem 1.3rem 1.6rem; }
+    header.masthead{ padding: 2.2rem 1rem 1.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="vignette"></div>
+
+<header class="masthead">
+  <svg class="sigil" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="38" stroke="#6b4423" stroke-width="1.2"/>
+    <circle cx="50" cy="50" r="4" fill="#6b4423"/>
+    <path d="M50 12 L50 88 M12 50 L88 50" stroke="#6b4423" stroke-width="0.8" opacity="0.6"/>
+    <path d="M50 12 L62 38 L50 32 L38 38 Z" fill="#9c7a2e" opacity="0.85"/>
+    <path d="M22 30 L78 70 M78 30 L22 70" stroke="#6b4423" stroke-width="0.6" opacity="0.35"/>
+  </svg>
+  <div class="eyebrow">Paracelso · Tradução de Attílio Cancian</div>
+  <h1 class="title">Botânica <em>Oculta</em></h1>
+  <p class="subtitle">um herbário das plantas mágicas, seus planetas e suas virtudes secretas</p>
+  <p class="attribution">102 ervas catalogadas</p>
+</header>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#2b2014" stroke-width="1.6">
+      <circle cx="10.5" cy="10.5" r="6.5"/>
+      <line x1="21" y1="21" x2="15.5" y2="15.5"/>
+    </svg>
+    <input id="searchInput" type="text" placeholder="Buscar por nome, virtude, signo ou planeta…" autocomplete="off">
+  </div>
+  <div class="result-count" id="resultCount"></div>
+</div>
+
+<div class="filters">
+  <div class="filter-label">Planetas regentes</div>
+  <div class="filter-row" id="planetFilters"></div>
+  <div class="filter-label">Signos do zodíaco</div>
+  <div class="filter-row" id="signFilters"></div>
+</div>
+
+<main>
+  <div class="grid" id="grid"></div>
+  <div class="no-results" id="noResults" style="display:none;">Nenhuma erva encontrada nas sombras do grimório. Tentai outro nome ou sinal.</div>
+</main>
+
+<footer>
+  <div class="ornament">❖ ❖ ❖</div>
+  Compilado a partir de "As Plantas Mágicas — Botânica Oculta", de Paracelso<br>
+  Hemus Livraria Editora, 1976 — supervisão de Maxim Behar
+</footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script src="plantas_data.js"></script>
+<script>
+const PLANETA_GLIFOS = {
+  'Saturno': '♄', 'Júpiter': '♃', 'Marte': '♂', 'Sol': '☉',
+  'Vênus': '♀', 'Mercúrio': '☿', 'Lua': '☽'
+};
+const SIGNO_GLIFOS = {
+  'Áries':'♈','Touro':'♉','Gêmeos':'♊','Câncer':'♋','Leão':'♌','Virgem':'♍',
+  'Libra':'♎','Escorpião':'♏','Sagitário':'♐','Capricórnio':'♑','Aquário':'♒','Peixes':'♓'
+};
+
+const PLANETAS_ORDEM = ['Saturno','Júpiter','Marte','Sol','Vênus','Mercúrio','Lua'];
+const SIGNOS_ORDEM = ['Áries','Touro','Gêmeos','Câncer','Leão','Virgem','Libra','Escorpião','Sagitário','Capricórnio','Aquário','Peixes'];
+
+let activePlanets = new Set();
+let activeSigns = new Set();
+let query = '';
+
+function buildFilterChips(){
+  const pWrap = document.getElementById('planetFilters');
+  PLANETAS_ORDEM.forEach(p => {
+    const has = PLANTAS_DATA.some(pl => pl.planetasChave.includes(p));
+    if(!has) return;
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.dataset.planet = p;
+    chip.innerHTML = `<span class="glyph">${PLANETA_GLIFOS[p]||''}</span><span>${p}</span>`;
+    chip.addEventListener('click', () => {
+      if(activePlanets.has(p)) activePlanets.delete(p); else activePlanets.add(p);
+      chip.classList.toggle('active');
+      render();
+    });
+    pWrap.appendChild(chip);
+  });
+
+  const sWrap = document.getElementById('signFilters');
+  SIGNOS_ORDEM.forEach(s => {
+    const has = PLANTAS_DATA.some(pl => pl.signosChave.includes(s));
+    if(!has) return;
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.dataset.sign = s;
+    chip.innerHTML = `<span class="glyph">${SIGNO_GLIFOS[s]||''}</span><span>${s}</span>`;
+    chip.addEventListener('click', () => {
+      if(activeSigns.has(s)) activeSigns.delete(s); else activeSigns.add(s);
+      chip.classList.toggle('active');
+      render();
+    });
+    sWrap.appendChild(chip);
+  });
+}
+
+function matchesQuery(p, q){
+  if(!q) return true;
+  const hay = [
+    p.nome, p.cientifico, p.usosMedicinais, p.ocultismo,
+    p.planeta, p.signo, p.colheita, p.elemento
+  ].join(' ').toLowerCase();
+  return hay.includes(q.toLowerCase());
+}
+
+function filterPlantas(){
+  return PLANTAS_DATA.filter(p => {
+    if(!matchesQuery(p, query)) return false;
+    if(activePlanets.size > 0){
+      const ok = p.planetasChave.some(pl => activePlanets.has(pl));
+      if(!ok) return false;
+    }
+    if(activeSigns.size > 0){
+      const ok = p.signosChave.some(s => activeSigns.has(s));
+      if(!ok) return false;
+    }
+    return true;
+  });
+}
+
+function snippetFor(p){
+  const text = p.ocultismo && p.ocultismo.trim() ? p.ocultismo : (p.usosMedicinais || '');
+  return text || 'Sem registros conhecidos neste grimório.';
+}
+
+function glyphBadgesFor(p){
+  let html = '';
+  p.planetasChave.slice(0,2).forEach(pl => {
+    html += `<span class="glyph-badge" title="${pl}">${PLANETA_GLIFOS[pl]}</span>`;
+  });
+  if(p.signosChave.length){
+    html += `<span class="glyph-badge" title="${p.signosChave[0]}">${SIGNO_GLIFOS[p.signosChave[0]]}</span>`;
+  }
+  return html;
+}
+
+function render(){
+  const list = filterPlantas();
+  const grid = document.getElementById('grid');
+  const noResults = document.getElementById('noResults');
+  const count = document.getElementById('resultCount');
+
+  count.textContent = list.length === PLANTAS_DATA.length
+    ? `${PLANTAS_DATA.length} ervas no grimório`
+    : `${list.length} de ${PLANTAS_DATA.length} ervas encontradas`;
+
+  grid.innerHTML = '';
+  if(list.length === 0){
+    noResults.style.display = 'block';
+    return;
+  }
+  noResults.style.display = 'none';
+
+  list.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-top">
+        <div>
+          <div class="card-name">${p.nome}</div>
+          <div class="card-sci">${p.cientifico || ''}</div>
+        </div>
+        <div class="card-glyphs">${glyphBadgesFor(p)}</div>
+      </div>
+      <div class="card-snippet">${snippetFor(p)}</div>
+      <div class="card-foot">
+        <span>${p.planeta || '—'}</span>
+        <span>${p.signo ? p.signo.split(/[,;]| ou /)[0] : ''}</span>
+      </div>
+    `;
+    card.addEventListener('click', () => openModal(p));
+    grid.appendChild(card);
+  });
+}
+
+function tagsFor(p){
+  let html = '';
+  p.planetasChave.forEach(pl => {
+    html += `<span class="tag"><span class="glyph">${PLANETA_GLIFOS[pl]}</span>${pl}</span>`;
+  });
+  p.signosChave.forEach(s => {
+    html += `<span class="tag"><span class="glyph">${SIGNO_GLIFOS[s]}</span>${s}</span>`;
+  });
+  return html;
+}
+
+function openModal(p){
+  const modal = document.getElementById('modalContent');
+  modal.innerHTML = `
+    <button class="modal-close" id="modalCloseBtn" aria-label="Fechar">✕</button>
+    <div class="modal-head">
+      <div class="modal-name">${p.nome}</div>
+      <div class="modal-sci">${p.cientifico || ''}</div>
+      <div class="modal-tags">${tagsFor(p) || '<span class="empty-note">Sem correspondências astrológicas registradas</span>'}</div>
+    </div>
+
+    <div class="modal-section">
+      <div class="section-label">Usos medicinais<span class="rule"></span></div>
+      <div class="section-text">${p.usosMedicinais ? p.usosMedicinais : '<span class="empty-note">Nenhum uso medicinal registrado nesta obra.</span>'}</div>
+    </div>
+
+    <div class="modal-section">
+      <div class="section-label oculto">Botânica oculta<span class="rule"></span></div>
+      <div class="section-text">${p.ocultismo ? p.ocultismo : '<span class="empty-note">Virtudes mágicas desconhecidas pelo autor.</span>'}</div>
+    </div>
+
+    <div class="modal-meta-grid">
+      <div class="meta-item">
+        <div class="meta-label">Planeta</div>
+        <div class="meta-value">${p.planeta || '—'}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Signo</div>
+        <div class="meta-value">${p.signo || '—'}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Natureza</div>
+        <div class="meta-value">${p.elemento || '—'}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Colheita</div>
+        <div class="meta-value">${p.colheita || '—'}</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('overlay').addEventListener('click', (e) => {
+  if(e.target.id === 'overlay') closeModal();
+});
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape') closeModal();
+});
+
+let debounceTimer;
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    query = e.target.value;
+    render();
+  }, 80);
+});
+
+buildFilterChips();
+render();
+</script>
+
+</body>
+</html>
