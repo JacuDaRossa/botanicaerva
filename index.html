@@ -3,441 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Botânica Oculta — Herbário de Paracelso</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Cinzel:wght@400;500;600&display=swap');
-
-  :root{
-    --parchment: #ece2c6;
-    --parchment-dark: #ddcd9d;
-    --ink: #2b2014;
-    --ink-soft: #4a3c26;
-    --umber: #6b4423;
-    --umber-deep: #3d2914;
-    --gold: #9c7a2e;
-    --gold-bright: #c9a227;
-    --verdigris: #4f6b54;
-    --blood: #6e2a1f;
-    --rule: rgba(43,32,20,0.28);
-    --shadow: rgba(20,14,6,0.35);
-  }
-
-  *{ box-sizing: border-box; }
-  html{ scroll-behavior: smooth; }
-
-  body{
-    margin:0;
-    background-color: var(--parchment);
-    background-image:
-      radial-gradient(ellipse at 15% 8%, rgba(155,120,50,0.16), transparent 45%),
-      radial-gradient(ellipse at 88% 92%, rgba(110,42,31,0.12), transparent 50%),
-      repeating-linear-gradient(0deg, rgba(75,55,25,0.025) 0px, rgba(75,55,25,0.025) 1px, transparent 1px, transparent 3px);
-    color: var(--ink);
-    font-family: 'EB Garamond', serif;
-    min-height: 100vh;
-  }
-
-  /* textura de papel via noise svg */
-  body::before{
-    content:"";
-    position: fixed; inset:0;
-    pointer-events:none;
-    opacity:0.5;
-    mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
-    z-index: 0;
-  }
-
-  .vignette{
-    position: fixed; inset:0; pointer-events:none; z-index:1;
-    box-shadow: inset 0 0 18vw rgba(20,14,6,0.32);
-  }
-
-  a{ color: var(--umber); }
-
-  /* ===== Cabeçalho ===== */
-  header.masthead{
-    position: relative;
-    z-index: 2;
-    padding: 3.2rem 1.5rem 2rem;
-    text-align: center;
-    border-bottom: 1px solid var(--rule);
-  }
-  .sigil{
-    width: 64px; height: 64px;
-    margin: 0 auto 0.8rem;
-    opacity: 0.92;
-  }
-  .eyebrow{
-    font-family: 'Cinzel', serif;
-    letter-spacing: 0.32em;
-    font-size: 0.68rem;
-    color: var(--umber);
-    text-transform: uppercase;
-    margin-bottom: 0.6rem;
-  }
-  h1.title{
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 600;
-    font-size: clamp(2.4rem, 6vw, 4.2rem);
-    margin: 0;
-    letter-spacing: 0.01em;
-    color: var(--umber-deep);
-    text-shadow: 0 1px 0 rgba(255,255,255,0.25);
-  }
-  h1.title em{
-    font-style: italic;
-    color: var(--blood);
-  }
-  .subtitle{
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 1.15rem;
-    color: var(--ink-soft);
-    margin-top: 0.5rem;
-    letter-spacing: 0.02em;
-  }
-  .attribution{
-    margin-top: 1.1rem;
-    font-family: 'Cinzel', serif;
-    font-size: 0.72rem;
-    letter-spacing: 0.18em;
-    color: var(--gold);
-    text-transform: uppercase;
-  }
-
-  /* ===== Busca ===== */
-  .search-wrap{
-    position: relative;
-    z-index: 5;
-    max-width: 680px;
-    margin: -1.4rem auto 0;
-    padding: 0 1.5rem;
-  }
-  .search-box{
-    position: relative;
-    background: linear-gradient(180deg, #f4ecd2, #e9dcb0);
-    border: 1px solid var(--rule);
-    border-radius: 3px;
-    box-shadow: 0 10px 28px var(--shadow), inset 0 0 0 1px rgba(255,255,255,0.35);
-    padding: 0.2rem;
-  }
-  .search-box input{
-    width: 100%;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.3rem;
-    font-style: italic;
-    color: var(--ink);
-    padding: 0.85rem 1.1rem 0.85rem 3rem;
-  }
-  .search-box input::placeholder{ color: rgba(43,32,20,0.45); }
-  .search-icon{
-    position:absolute; left: 1rem; top: 50%; transform: translateY(-50%);
-    width: 20px; height: 20px; opacity: 0.55;
-  }
-  .result-count{
-    text-align:center;
-    font-family: 'Cinzel', serif;
-    font-size: 0.7rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin-top: 0.7rem;
-    opacity: 0.75;
-  }
-
-  /* ===== Filtros ===== */
-  .filters{
-    max-width: 980px;
-    margin: 1.6rem auto 0;
-    padding: 0 1.5rem;
-    position: relative;
-    z-index: 4;
-  }
-  .filter-row{
-    display:flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    justify-content:center;
-    margin-bottom: 0.55rem;
-  }
-  .filter-label{
-    font-family:'Cinzel', serif;
-    font-size: 0.62rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--gold);
-    width: 100%;
-    text-align: center;
-    margin-bottom: 0.3rem;
-    margin-top: 0.5rem;
-  }
-  .chip{
-    font-family: 'EB Garamond', serif;
-    font-size: 0.88rem;
-    padding: 0.32rem 0.85rem;
-    border: 1px solid var(--rule);
-    border-radius: 999px;
-    background: rgba(244,236,210,0.5);
-    color: var(--ink-soft);
-    cursor: pointer;
-    transition: all 0.15s ease;
-    display:flex; align-items:center; gap:0.35rem;
-    user-select:none;
-  }
-  .chip:hover{ background: rgba(244,236,210,0.95); border-color: var(--gold); }
-  .chip.active{
-    background: var(--umber-deep);
-    color: var(--parchment);
-    border-color: var(--umber-deep);
-  }
-  .chip .glyph{ font-size: 1rem; line-height:1; }
-
-  /* ===== Grade de plantas ===== */
-  main{
-    position: relative;
-    z-index: 2;
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 2.2rem 1.5rem 5rem;
-  }
-  .grid{
-    display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.1rem;
-  }
-  .card{
-    background: linear-gradient(165deg, #f3ead0, #e6d8a9);
-    border: 1px solid var(--rule);
-    border-radius: 2px;
-    padding: 1.3rem 1.2rem 1.1rem;
-    cursor: pointer;
-    position: relative;
-    box-shadow: 0 3px 10px rgba(20,14,6,0.12);
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-  }
-  .card::before{
-    content:"";
-    position:absolute; top:6px; left:6px; right:6px; bottom:6px;
-    border: 1px solid rgba(43,32,20,0.14);
-    pointer-events:none;
-  }
-  .card:hover{
-    transform: translateY(-3px);
-    box-shadow: 0 10px 22px rgba(20,14,6,0.22);
-  }
-  .card-top{
-    display:flex; justify-content: space-between; align-items:flex-start;
-    margin-bottom: 0.5rem;
-  }
-  .card-name{
-    font-family:'Cormorant Garamond', serif;
-    font-weight: 600;
-    font-size: 1.32rem;
-    color: var(--umber-deep);
-    line-height:1.15;
-  }
-  .card-sci{
-    font-style: italic;
-    font-family: 'EB Garamond', serif;
-    font-size: 0.82rem;
-    color: var(--ink-soft);
-    opacity: 0.8;
-    margin-top: 0.15rem;
-  }
-  .card-glyphs{
-    display:flex; gap:0.3rem; flex-shrink:0; margin-left:0.5rem;
-  }
-  .glyph-badge{
-    width:24px; height:24px;
-    border-radius:50%;
-    border: 1px solid var(--rule);
-    display:flex; align-items:center; justify-content:center;
-    font-size: 0.85rem;
-    background: rgba(255,255,255,0.25);
-    color: var(--umber);
-  }
-  .card-snippet{
-    font-size: 0.92rem;
-    line-height: 1.45;
-    color: var(--ink-soft);
-    margin-top: 0.5rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .card-snippet b{ color: var(--blood); font-weight: 600; }
-  .card-foot{
-    margin-top: 0.7rem;
-    padding-top: 0.55rem;
-    border-top: 1px dashed var(--rule);
-    font-family:'Cinzel', serif;
-    font-size: 0.62rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--gold);
-    display:flex; justify-content: space-between;
-  }
-  .no-results{
-    text-align:center;
-    padding: 4rem 1rem;
-    font-family:'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 1.4rem;
-    color: var(--ink-soft);
-  }
-
-  /* ===== Modal ===== */
-  .overlay{
-    position: fixed; inset:0;
-    background: rgba(20,14,6,0.55);
-    backdrop-filter: blur(2px);
-    z-index: 50;
-    display:none;
-    align-items:flex-start;
-    justify-content:center;
-    overflow-y:auto;
-    padding: 3vh 1rem 5vh;
-  }
-  .overlay.open{ display:flex; }
-  .modal{
-    background: linear-gradient(170deg, #f6efd9, #e9dba9);
-    max-width: 680px;
-    width: 100%;
-    border-radius: 3px;
-    border: 1px solid var(--rule);
-    box-shadow: 0 24px 60px rgba(0,0,0,0.45);
-    position: relative;
-    padding: 2.4rem 2.2rem 2.2rem;
-  }
-  .modal::before{
-    content:"";
-    position:absolute; top:10px; left:10px; right:10px; bottom:10px;
-    border: 1px solid rgba(43,32,20,0.16);
-    pointer-events:none;
-  }
-  .modal-close{
-    position:absolute; top:1rem; right:1.1rem;
-    width: 34px; height:34px;
-    border-radius: 50%;
-    border: 1px solid var(--rule);
-    background: rgba(255,255,255,0.3);
-    cursor:pointer;
-    font-size: 1.2rem;
-    color: var(--ink-soft);
-    line-height:1;
-    display:flex; align-items:center; justify-content:center;
-    transition: background 0.15s;
-  }
-  .modal-close:hover{ background: rgba(255,255,255,0.7); }
-  .modal-head{ margin-bottom: 1.3rem; padding-right: 2rem;}
-  .modal-name{
-    font-family:'Cormorant Garamond', serif;
-    font-weight:700;
-    font-size: clamp(1.9rem, 4vw, 2.5rem);
-    color: var(--umber-deep);
-    line-height:1.05;
-  }
-  .modal-sci{
-    font-style: italic;
-    font-size: 1.05rem;
-    color: var(--ink-soft);
-    margin-top: 0.25rem;
-  }
-  .modal-tags{
-    display:flex; gap:0.5rem; flex-wrap:wrap;
-    margin-top: 0.8rem;
-  }
-  .tag{
-    font-family:'Cinzel', serif;
-    font-size:0.62rem;
-    letter-spacing:0.1em;
-    text-transform:uppercase;
-    padding: 0.28rem 0.65rem;
-    border-radius: 999px;
-    border:1px solid var(--rule);
-    background: rgba(255,255,255,0.35);
-    color: var(--ink-soft);
-    display:flex; align-items:center; gap:0.3rem;
-  }
-  .tag .glyph{ font-size:0.95rem; }
-  .modal-section{
-    margin-top: 1.4rem;
-    padding-top: 1.2rem;
-    border-top: 1px solid var(--rule);
-  }
-  .modal-section:first-of-type{ border-top:none; margin-top: 1.6rem; padding-top:0; }
-  .section-label{
-    font-family:'Cinzel', serif;
-    font-size: 0.68rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--blood);
-    margin-bottom: 0.5rem;
-    display:flex; align-items:center; gap:0.5rem;
-  }
-  .section-label .rule{
-    flex:1;
-    height:1px;
-    background: var(--rule);
-  }
-  .section-label.oculto{ color: var(--verdigris); }
-  .section-text{
-    font-size: 1.04rem;
-    line-height: 1.62;
-    color: var(--ink);
-  }
-  .empty-note{
-    font-style: italic;
-    opacity: 0.6;
-    font-size: 0.95rem;
-  }
-  .modal-meta-grid{
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
-    gap: 0.8rem;
-    margin-top: 1.4rem;
-    padding-top: 1.2rem;
-    border-top: 1px solid var(--rule);
-  }
-  .meta-item .meta-label{
-    font-family:'Cinzel', serif;
-    font-size: 0.6rem;
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-    color: var(--gold);
-    margin-bottom: 0.2rem;
-  }
-  .meta-item .meta-value{
-    font-size: 0.96rem;
-    color: var(--ink-soft);
-  }
-
-  /* ===== Rodapé ===== */
-  footer{
-    text-align:center;
-    padding: 2.5rem 1.5rem 3rem;
-    font-size: 0.85rem;
-    color: var(--ink-soft);
-    opacity: 0.7;
-    position: relative; z-index: 2;
-    border-top: 1px solid var(--rule);
-  }
-  footer .ornament{ font-size: 1.3rem; color: var(--gold); margin-bottom: 0.5rem; letter-spacing: 0.5em;}
-
-  @media (max-width: 560px){
-    .modal{ padding: 2rem 1.3rem 1.6rem; }
-    header.masthead{ padding: 2.2rem 1rem 1.6rem; }
-  }
-</style>
+<title>Botânica Oculta — Paracelso & Umbanda</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="vignette"></div>
+
+<button class="global-search-trigger" id="globalSearchTrigger" title="Busca global (Ctrl+K)">🔍</button>
+<button class="theme-toggle" id="themeToggle" title="Alternar tema">🌙</button>
+
+<div class="global-overlay" id="globalOverlay">
+  <div style="width:100%;max-width:740px;">
+    <div class="global-search-box">
+      <input id="globalInput" type="text" placeholder="Buscar em todas as abas…" autocomplete="off">
+      <button class="global-close-btn" id="globalCloseBtn">✕</button>
+    </div>
+    <div class="global-results" id="globalResults">
+      <div class="global-hint-bar"><span>↑↓ navegar</span><span>Enter abrir</span><span>Esc fechar</span></div>
+    </div>
+  </div>
+</div>
 
 <header class="masthead">
   <svg class="sigil" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -447,39 +33,137 @@
     <path d="M50 12 L62 38 L50 32 L38 38 Z" fill="#9c7a2e" opacity="0.85"/>
     <path d="M22 30 L78 70 M78 30 L22 70" stroke="#6b4423" stroke-width="0.6" opacity="0.35"/>
   </svg>
-  <div class="eyebrow">Paracelso · Tradução de Attílio Cancian</div>
+  <div class="eyebrow">Duas tradições, um herbário</div>
   <h1 class="title">Botânica <em>Oculta</em></h1>
-  <p class="subtitle">um herbário das plantas mágicas, seus planetas e suas virtudes secretas</p>
-  <p class="attribution">102 ervas catalogadas</p>
+  <p class="subtitle">de Paracelso aos terreiros: o saber das ervas mágicas através do tempo</p>
+
+  <div class="tabs-wrap">
+    <button class="tab-btn paracelso active" data-view="paracelso">
+      Paracelso
+      <span class="tab-sub">Botânica Oculta, 1976</span>
+    </button>
+    <button class="tab-btn umbanda" data-view="umbanda">
+      Umbanda
+      <span class="tab-sub">Rituais com Ervas, Adriano Camargo</span>
+    </button>
+    <button class="tab-btn preparo" data-view="preparo">
+      Guia de Preparo
+      <span class="tab-sub">Chás, banhos, defumações…</span>
+    </button>
+    <button class="tab-btn trabalhos" data-view="trabalhos">
+      Trabalhos & Oferendas
+      <span class="tab-sub">Rituais completos e oferendas</span>
+    </button>
+  </div>
 </header>
 
-<div class="search-wrap">
-  <div class="search-box">
-    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#2b2014" stroke-width="1.6">
-      <circle cx="10.5" cy="10.5" r="6.5"/>
-      <line x1="21" y1="21" x2="15.5" y2="15.5"/>
-    </svg>
-    <input id="searchInput" type="text" placeholder="Buscar por nome, virtude, signo ou planeta…" autocomplete="off">
+<div class="view paracelso active" id="view-paracelso">
+  <div class="search-wrap">
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#2b2014" stroke-width="1.6">
+        <circle cx="10.5" cy="10.5" r="6.5"/><line x1="21" y1="21" x2="15.5" y2="15.5"/>
+      </svg>
+      <input id="searchInputP" type="text" placeholder="Buscar por nome, virtude, signo ou planeta…" autocomplete="off">
+    </div>
+    <div class="result-count" id="resultCountP"></div>
   </div>
-  <div class="result-count" id="resultCount"></div>
+
+  <div class="filters">
+    <div class="filter-label">Planetas regentes</div>
+    <div class="filter-row" id="planetFilters"></div>
+    <div class="filter-label">Signos do zodíaco</div>
+    <div class="filter-row" id="signFilters"></div>
+    <div class="filter-row">
+      <div class="chip cross-only" id="crossFilterP"><span class="glyph">✦</span><span>Apenas com correspondência na Umbanda</span></div>
+    </div>
+  </div>
+
+  <main>
+    <div class="grid" id="gridP"></div>
+    <div class="no-results" id="noResultsP" style="display:none;">Nenhuma erva encontrada nas sombras do grimório. Tentai outro nome ou sinal.</div>
+  </main>
 </div>
 
-<div class="filters">
-  <div class="filter-label">Planetas regentes</div>
-  <div class="filter-row" id="planetFilters"></div>
-  <div class="filter-label">Signos do zodíaco</div>
-  <div class="filter-row" id="signFilters"></div>
+<div class="view umbanda" id="view-umbanda">
+  <div class="search-wrap">
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#2b2014" stroke-width="1.6">
+        <circle cx="10.5" cy="10.5" r="6.5"/><line x1="21" y1="21" x2="15.5" y2="15.5"/>
+      </svg>
+      <input id="searchInputU" type="text" placeholder="Buscar por nome, orixá, ação ou indicação…" autocomplete="off">
+    </div>
+    <div class="result-count" id="resultCountU"></div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-label">Categoria ritual</div>
+    <div class="filter-row" id="catFilters"></div>
+    <div class="filter-label">Forma de uso</div>
+    <div class="filter-row" id="formaFilters"></div>
+    <div class="filter-label">Orixás</div>
+    <div class="filter-row" id="orixaFilters"></div>
+    <div class="filter-row">
+      <div class="chip cross-only" id="crossFilterU"><span class="glyph">✦</span><span>Apenas com correspondência em Paracelso</span></div>
+    </div>
+  </div>
+
+  <main>
+    <div class="grid" id="gridU"></div>
+    <div class="no-results" id="noResultsU" style="display:none;">Nenhuma erva encontrada no herbário do terreiro. Tentai outro nome ou orixá.</div>
+  </main>
 </div>
 
-<main>
-  <div class="grid" id="grid"></div>
-  <div class="no-results" id="noResults" style="display:none;">Nenhuma erva encontrada nas sombras do grimório. Tentai outro nome ou sinal.</div>
-</main>
+<div class="view preparo" id="view-preparo">
+  <div class="search-wrap">
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#2b2014" stroke-width="1.6">
+        <circle cx="10.5" cy="10.5" r="6.5"/><line x1="21" y1="21" x2="15.5" y2="15.5"/>
+      </svg>
+      <input id="searchInputPrep" type="text" placeholder="Buscar por método, modo de preparo ou erva…" autocomplete="off">
+    </div>
+    <div class="result-count" id="resultCountPrep"></div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-label">Tipo de preparo</div>
+    <div class="filter-row" id="tipoPreparoFilters"></div>
+  </div>
+
+  <main>
+    <div class="grid" id="gridPrep"></div>
+    <div class="no-results" id="noResultsPrep" style="display:none;">Nenhum método de preparo encontrado.</div>
+  </main>
+</div>
+
+<div class="view trabalhos" id="view-trabalhos">
+  <div class="search-wrap">
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#2b2014" stroke-width="1.6">
+        <circle cx="10.5" cy="10.5" r="6.5"/><line x1="21" y1="21" x2="15.5" y2="15.5"/>
+      </svg>
+      <input id="searchInputTrab" type="text" placeholder="Buscar por nome, objetivo, orixá ou erva…" autocomplete="off">
+    </div>
+    <div class="result-count" id="resultCountTrab"></div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-label">Tipo</div>
+    <div class="filter-row" id="tipoTrabFilters"></div>
+    <div class="filter-label">Fonte</div>
+    <div class="filter-row" id="fonteTrabFilters"></div>
+  </div>
+
+  <main>
+    <div class="grid" id="gridTrab"></div>
+    <div class="no-results" id="noResultsTrab" style="display:none;">Nenhum trabalho ou oferenda encontrado.</div>
+  </main>
+</div>
 
 <footer>
   <div class="ornament">❖ ❖ ❖</div>
-  Compilado a partir de "As Plantas Mágicas — Botânica Oculta", de Paracelso<br>
-  Hemus Livraria Editora, 1976 — supervisão de Maxim Behar
+  Paracelso: "As Plantas Mágicas — Botânica Oculta" (Hemus, 1976)<br>
+  Umbanda: "Rituais com Ervas — Banhos, Defumações e Benzimentos", Adriano Camargo (O Erveiro, 6ª ed.)<br>
+  <span style="font-size:0.85em; color: var(--ink-soft);">✦ indica correspondência identificada entre as duas obras · clique nas ervas e métodos para navegar entre as três seções</span>
 </footer>
 
 <div class="overlay" id="overlay">
@@ -488,213 +172,859 @@
 
 <script src="plantas_data.js"></script>
 <script>
-const PLANETA_GLIFOS = {
-  'Saturno': '♄', 'Júpiter': '♃', 'Marte': '♂', 'Sol': '☉',
-  'Vênus': '♀', 'Mercúrio': '☿', 'Lua': '☽'
-};
-const SIGNO_GLIFOS = {
-  'Áries':'♈','Touro':'♉','Gêmeos':'♊','Câncer':'♋','Leão':'♌','Virgem':'♍',
-  'Libra':'♎','Escorpião':'♏','Sagitário':'♐','Capricórnio':'♑','Aquário':'♒','Peixes':'♓'
-};
-
+const PLANETA_GLIFOS = { 'Saturno': '♄', 'Júpiter': '♃', 'Marte': '♂', 'Sol': '☉', 'Vênus': '♀', 'Mercúrio': '☿', 'Lua': '☽' };
+const SIGNO_GLIFOS = { 'Áries':'♈','Touro':'♉','Gêmeos':'♊','Câncer':'♋','Leão':'♌','Virgem':'♍','Libra':'♎','Escorpião':'♏','Sagitário':'♐','Capricórnio':'♑','Aquário':'♒','Peixes':'♓' };
 const PLANETAS_ORDEM = ['Saturno','Júpiter','Marte','Sol','Vênus','Mercúrio','Lua'];
 const SIGNOS_ORDEM = ['Áries','Touro','Gêmeos','Câncer','Leão','Virgem','Libra','Escorpião','Sagitário','Capricórnio','Aquário','Peixes'];
+const CATEGORIAS_ORDEM = ['Quente/Agressiva', 'Morna/Equilibradora'];
+const CAT_GLIFOS = { 'Quente/Agressiva': '🔥', 'Morna/Equilibradora': '⚖' };
 
-let activePlanets = new Set();
-let activeSigns = new Set();
-let query = '';
+const FORMA_GLIFOS = { 'Chá': '☕', 'Banho': '💧', 'Defumação': '🜔', 'Amaci': '👑', 'Bate-folhas': '🌿', 'Benzimento': '✚' };
+const FORMA_CLASSES = { 'Chá': 'forma-cha', 'Banho': 'forma-banho', 'Defumação': 'forma-defumacao', 'Amaci': 'forma-amaci', 'Bate-folhas': 'forma-batefolhas', 'Benzimento': 'forma-benzimento' };
+const FORMA_TO_PREPARO_IDS = {
+  'Chá': ['infusao', 'decoccao', 'tisana', 'maceracao', 'sal-grosso'],
+  'Banho': ['banho-fervido', 'banho-maceracao', 'banho-uso'],
+  'Defumação': ['defumacao'],
+  'Amaci': ['amaci'],
+  'Bate-folhas': ['bate-folhas'],
+  'Benzimento': ['benzimento']
+};
 
-function buildFilterChips(){
+const paracelsoIdx = {};
+PLANTAS_DATA.forEach(p => paracelsoIdx[p.nome] = p);
+const umbandaIdx = {};
+UMBANDA_DATA.forEach(u => umbandaIdx[u.nome] = u);
+const preparoIdx = {};
+PREPAROS_DATA.forEach(pr => preparoIdx[pr.id] = pr);
+const trabalhoIdx = {};
+TRABALHOS_DATA.forEach(t => trabalhoIdx[t.id] = t);
+
+const TIPO_GLIFOS = { 'Trabalho': '🜔', 'Oferenda': '🕯', 'Tabela de Finalidades': '☷' };
+
+function tipoClass(tipo){
+  if(!tipo) return '';
+  if(tipo === 'Trabalho') return 'tipo-trabalho';
+  if(tipo === 'Oferenda') return 'tipo-oferenda';
+  return 'tipo-tabela';
+}
+
+function catClass(cat){
+  if(!cat) return '';
+  if(cat.startsWith('Quente')) return 'cat-quente';
+  if(cat.startsWith('Morna')) return 'cat-morna';
+  return 'cat-fria';
+}
+
+const ORIXA_CANON = {
+  'oia': 'Iansã', 'oiá': 'Iansã', 'iansa': 'Iansã', 'iansã': 'Iansã',
+  'logunan': 'Oyá-Logunan', 'logunã': 'Oyá-Logunan', 'oya-logunan': 'Oyá-Logunan',
+  'oia-loguna': 'Oyá-Logunan', 'oiá-logunã': 'Oyá-Logunan', 'oyá-logunan': 'Oyá-Logunan',
+  'oxossi': 'Oxóssi', 'oxóssi': 'Oxóssi',
+  'oxala': 'Oxalá', 'oxalá': 'Oxalá',
+  'xango': 'Xangô', 'xangô': 'Xangô',
+  'ogum': 'Ogum',
+  'oxum': 'Oxum',
+  'iemanja': 'Iemanjá', 'iemanjá': 'Iemanjá',
+  'nana': 'Naná', 'naná': 'Naná',
+  'obaluaiye': 'Obaluaiyê', 'obaluaiyê': 'Obaluaiyê',
+  'omulu': 'Omulu',
+  'oba': 'Obá', 'obá': 'Obá',
+  'oxumare': 'Oxumaré', 'oxumaré': 'Oxumaré',
+  'egunita': 'Egunitá', 'egunitá': 'Egunitá',
+  'exu mirim': 'Exu Mirim',
+  'exu': 'Exu'
+};
+
+function canonOrixa(s){
+  const key = s.toLowerCase().trim();
+  return ORIXA_CANON[key] || s;
+}
+
+function extraiOrixas(str){
+  if(!str) return [];
+  return str.split(/[,;]| e (?=[A-ZÀÁÂÃÉÊÍÓÔÕÚ])/).map(s => s.trim()).filter(Boolean)
+    .map(s => s.replace(/\(.*?\)/g,'').trim())
+    .filter(s => s.length > 1 && s.length < 22)
+    .filter(s => !/^todos/i.test(s))
+    .map(canonOrixa);
+}
+UMBANDA_DATA.forEach(u => { u._orixasList = extraiOrixas(u.orixas); });
+
+let activePlanets = new Set(), activeSigns = new Set(), queryP = '', crossOnlyP = false;
+let activeCats = new Set(), activeOrixas = new Set(), activeFormas = new Set(), queryU = '', crossOnlyU = false;
+let activeTiposPreparo = new Set(), queryPrep = '';
+let activeTiposTrab = new Set(), activeFontesTrab = new Set(), queryTrab = '';
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const target = btn.dataset.view;
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + target).classList.add('active');
+  });
+});
+
+function buildFilterChipsP(){
   const pWrap = document.getElementById('planetFilters');
   PLANETAS_ORDEM.forEach(p => {
-    const has = PLANTAS_DATA.some(pl => pl.planetasChave.includes(p));
-    if(!has) return;
+    if(!PLANTAS_DATA.some(pl => pl.planetasChave.includes(p))) return;
     const chip = document.createElement('div');
     chip.className = 'chip';
-    chip.dataset.planet = p;
     chip.innerHTML = `<span class="glyph">${PLANETA_GLIFOS[p]||''}</span><span>${p}</span>`;
-    chip.addEventListener('click', () => {
-      if(activePlanets.has(p)) activePlanets.delete(p); else activePlanets.add(p);
-      chip.classList.toggle('active');
-      render();
-    });
+    chip.addEventListener('click', () => { activePlanets.has(p) ? activePlanets.delete(p) : activePlanets.add(p); chip.classList.toggle('active'); renderP(); });
     pWrap.appendChild(chip);
   });
-
   const sWrap = document.getElementById('signFilters');
   SIGNOS_ORDEM.forEach(s => {
-    const has = PLANTAS_DATA.some(pl => pl.signosChave.includes(s));
-    if(!has) return;
+    if(!PLANTAS_DATA.some(pl => pl.signosChave.includes(s))) return;
     const chip = document.createElement('div');
     chip.className = 'chip';
-    chip.dataset.sign = s;
     chip.innerHTML = `<span class="glyph">${SIGNO_GLIFOS[s]||''}</span><span>${s}</span>`;
-    chip.addEventListener('click', () => {
-      if(activeSigns.has(s)) activeSigns.delete(s); else activeSigns.add(s);
-      chip.classList.toggle('active');
-      render();
-    });
+    chip.addEventListener('click', () => { activeSigns.has(s) ? activeSigns.delete(s) : activeSigns.add(s); chip.classList.toggle('active'); renderP(); });
     sWrap.appendChild(chip);
+  });
+  document.getElementById('crossFilterP').addEventListener('click', (e) => { crossOnlyP = !crossOnlyP; e.currentTarget.classList.toggle('active'); renderP(); });
+}
+
+function matchesQueryP(p, q){
+  if(!q) return true;
+  return [p.nome, p.cientifico, p.usosMedicinais, p.ocultismo, p.planeta, p.signo, p.colheita, p.elemento].join(' ').toLowerCase().includes(q.toLowerCase());
+}
+function filterPlantasP(){
+  return PLANTAS_DATA.filter(p => {
+    if(!matchesQueryP(p, queryP)) return false;
+    if(activePlanets.size > 0 && !p.planetasChave.some(pl => activePlanets.has(pl))) return false;
+    if(activeSigns.size > 0 && !p.signosChave.some(s => activeSigns.has(s))) return false;
+    if(crossOnlyP && (!p.umbandaRef || p.umbandaRef.length === 0)) return false;
+    return true;
+  });
+}
+function snippetForP(p){ return (p.ocultismo && p.ocultismo.trim()) ? p.ocultismo : (p.usosMedicinais || 'Sem registros conhecidos neste grimório.'); }
+function glyphBadgesForP(p){
+  let html = '';
+  p.planetasChave.slice(0,2).forEach(pl => html += `<span class="glyph-badge" title="${pl}">${PLANETA_GLIFOS[pl]}</span>`);
+  if(p.signosChave.length) html += `<span class="glyph-badge" title="${p.signosChave[0]}">${SIGNO_GLIFOS[p.signosChave[0]]}</span>`;
+  if(p.umbandaRef && p.umbandaRef.length) html += `<span class="cross-badge" title="Há correspondência na Umbanda: ${p.umbandaRef.map(r=>r.nome).join(', ')}">✦</span>`;
+  return html;
+}
+
+function renderP(){
+  const list = filterPlantasP();
+  const grid = document.getElementById('gridP');
+  const noResults = document.getElementById('noResultsP');
+  document.getElementById('resultCountP').textContent = list.length === PLANTAS_DATA.length ? `${PLANTAS_DATA.length} ervas no grimório` : `${list.length} de ${PLANTAS_DATA.length} ervas encontradas`;
+  grid.innerHTML = '';
+  if(list.length === 0){ noResults.style.display = 'block'; return; }
+  noResults.style.display = 'none';
+  list.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-top">
+        <div><div class="card-name">${p.nome}</div><div class="card-sci">${p.cientifico || ''}</div></div>
+        <div class="card-glyphs">${glyphBadgesForP(p)}</div>
+      </div>
+      <div class="card-snippet">${snippetForP(p)}</div>
+      <div class="card-foot"><span>${p.planeta || '—'}</span><span>${p.signo ? p.signo.split(/[,;]| ou /)[0] : ''}</span></div>
+    `;
+    card.addEventListener('click', () => openModalParacelso(p));
+    grid.appendChild(card);
   });
 }
 
-function matchesQuery(p, q){
-  if(!q) return true;
-  const hay = [
-    p.nome, p.cientifico, p.usosMedicinais, p.ocultismo,
-    p.planeta, p.signo, p.colheita, p.elemento
-  ].join(' ').toLowerCase();
-  return hay.includes(q.toLowerCase());
+function tagsForP(p){
+  let html = '';
+  p.planetasChave.forEach(pl => html += `<span class="tag"><span class="glyph">${PLANETA_GLIFOS[pl]}</span>${pl}</span>`);
+  p.signosChave.forEach(s => html += `<span class="tag"><span class="glyph">${SIGNO_GLIFOS[s]}</span>${s}</span>`);
+  return html;
 }
 
-function filterPlantas(){
-  return PLANTAS_DATA.filter(p => {
-    if(!matchesQuery(p, query)) return false;
-    if(activePlanets.size > 0){
-      const ok = p.planetasChave.some(pl => activePlanets.has(pl));
-      if(!ok) return false;
-    }
-    if(activeSigns.size > 0){
-      const ok = p.signosChave.some(s => activeSigns.has(s));
-      if(!ok) return false;
-    }
+function crossBoxForParacelso(p){
+  if(!p.umbandaRef || p.umbandaRef.length === 0) return '';
+  const items = p.umbandaRef.map(ref => {
+    const u = umbandaIdx[ref.nome];
+    if(!u) return '';
+    const tipoLabel = ref.tipo === 'exata' ? 'mesma planta' : 'planta relacionada';
+    return `<div style="margin-bottom:0.5rem;"><strong>${u.nome}</strong> <span style="font-style:italic; color: var(--ink-soft);">(${tipoLabel})</span> — categoria ${u.categoria.split('(')[0].trim()} na Umbanda, ligada a ${u.orixas}.
+      <span class="cross-link" data-goto-umbanda="${u.nome}">ver na Umbanda →</span></div>`;
+  }).join('');
+  return `<div class="cross-box"><div class="cross-label"><span class="cross-glyph">✦</span> Também encontrada nos rituais de Umbanda</div><div class="cross-body">${items}</div></div>`;
+}
+
+function openModalParacelso(p){
+  history.replaceState(null,'','#paracelso/'+encodeURIComponent(p.nome));
+  const modal = document.getElementById('modalContent');
+  modal.className = 'modal';
+  modal.innerHTML = `
+    <button class="modal-close" id="modalCloseBtn" aria-label="Fechar">✕</button>
+    <div class="modal-head">
+      <div class="modal-name">${p.nome}</div>
+      <div class="modal-sci">${p.cientifico || ''}</div>
+      <div class="modal-tags">${tagsForP(p) || '<span class="empty-note">Sem correspondências astrológicas registradas</span>'}</div>
+    </div>
+    ${crossBoxForParacelso(p)}
+    <div class="modal-section">
+      <div class="section-label">Usos medicinais<span class="rule"></span></div>
+      <div class="section-text">${p.usosMedicinais ? p.usosMedicinais : '<span class="empty-note">Nenhum uso medicinal registrado nesta obra.</span>'}</div>
+    </div>
+    <div class="modal-section">
+      <div class="section-label oculto">Botânica oculta<span class="rule"></span></div>
+      <div class="section-text">${p.ocultismo ? p.ocultismo : '<span class="empty-note">Virtudes mágicas desconhecidas pelo autor.</span>'}</div>
+    </div>
+    <div class="modal-meta-grid">
+      <div class="meta-item"><div class="meta-label">Planeta</div><div class="meta-value">${p.planeta || '—'}</div></div>
+      <div class="meta-item"><div class="meta-label">Signo</div><div class="meta-value">${p.signo || '—'}</div></div>
+      <div class="meta-item"><div class="meta-label">Natureza</div><div class="meta-value">${p.elemento || '—'}</div></div>
+      <div class="meta-item"><div class="meta-label">Colheita</div><div class="meta-value">${p.colheita || '—'}</div></div>
+    </div>
+  `;
+  openOverlay();
+  document.querySelectorAll('[data-goto-umbanda]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      const u = umbandaIdx[e.currentTarget.dataset.gotoUmbanda];
+      if(u){ closeModal(); document.querySelector('.tab-btn.umbanda').click(); setTimeout(() => openModalUmbanda(u), 200); }
+    });
+  });
+}
+
+function buildFilterChipsU(){
+  const cWrap = document.getElementById('catFilters');
+  CATEGORIAS_ORDEM.forEach(c => {
+    if(!UMBANDA_DATA.some(u => u.categoria.startsWith(c.split('/')[0]))) return;
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.innerHTML = `<span class="glyph">${CAT_GLIFOS[c]}</span><span>${c}</span>`;
+    chip.addEventListener('click', () => { activeCats.has(c) ? activeCats.delete(c) : activeCats.add(c); chip.classList.toggle('active'); renderU(); });
+    cWrap.appendChild(chip);
+  });
+
+  const orixaSet = new Set();
+  UMBANDA_DATA.forEach(u => u._orixasList.forEach(o => orixaSet.add(o)));
+  const orixaOrdem = ['Oxalá','Oxóssi','Ogum','Xangô','Iansã','Oxum','Iemanjá','Naná','Obaluaiyê','Omulu','Obá','Oxumaré','Egunitá','Oyá-Logunan','Exu','Exu Mirim'];
+  const orixasFinal = orixaOrdem.filter(o => orixaSet.has(o));
+  orixaSet.forEach(o => { if(!orixasFinal.includes(o)) orixasFinal.push(o); });
+
+  const oWrap = document.getElementById('orixaFilters');
+  orixasFinal.forEach(o => {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.textContent = o;
+    chip.addEventListener('click', () => { activeOrixas.has(o) ? activeOrixas.delete(o) : activeOrixas.add(o); chip.classList.toggle('active'); renderU(); });
+    oWrap.appendChild(chip);
+  });
+
+  document.getElementById('crossFilterU').addEventListener('click', (e) => { crossOnlyU = !crossOnlyU; e.currentTarget.classList.toggle('active'); renderU(); });
+}
+
+function buildFormaFiltersU(){
+  const fWrap = document.getElementById('formaFilters');
+  const formasOrdem = ['Chá', 'Banho', 'Defumação', 'Amaci', 'Bate-folhas', 'Benzimento'];
+  formasOrdem.forEach(f => {
+    if(!UMBANDA_DATA.some(u => (u.formasDeUso||[]).includes(f))) return;
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.innerHTML = `<span class="glyph">${FORMA_GLIFOS[f]||''}</span><span>${f}</span>`;
+    chip.addEventListener('click', () => { activeFormas.has(f) ? activeFormas.delete(f) : activeFormas.add(f); chip.classList.toggle('active'); renderU(); });
+    fWrap.appendChild(chip);
+  });
+}
+
+function matchesQueryU(u, q){
+  if(!q) return true;
+  return [u.nome, u.cientifico, u.sinonimos, u.indicacoes, u.acoes, u.orixas, u.categoria].join(' ').toLowerCase().includes(q.toLowerCase());
+}
+function filterErvasU(){
+  return UMBANDA_DATA.filter(u => {
+    if(!matchesQueryU(u, queryU)) return false;
+    if(activeCats.size > 0 && !([...activeCats].some(c => u.categoria.startsWith(c.split('/')[0])))) return false;
+    if(activeOrixas.size > 0 && !u._orixasList.some(o => activeOrixas.has(o))) return false;
+    if(activeFormas.size > 0 && !(u.formasDeUso||[]).some(f => activeFormas.has(f))) return false;
+    if(crossOnlyU && !u.paracelsoRef) return false;
     return true;
   });
 }
 
-function snippetFor(p){
-  const text = p.ocultismo && p.ocultismo.trim() ? p.ocultismo : (p.usosMedicinais || '');
-  return text || 'Sem registros conhecidos neste grimório.';
+function formaPillsHtml(formas, clickable){
+  if(!formas || !formas.length) return '';
+  return `<div class="forma-pills">${formas.map(f =>
+    `<span class="forma-pill ${FORMA_CLASSES[f]||''}" ${clickable ? `data-goto-preparo-forma="${f}"` : ''} title="${f}">${FORMA_GLIFOS[f]||''} ${f}</span>`
+  ).join('')}</div>`;
 }
 
-function glyphBadgesFor(p){
-  let html = '';
-  p.planetasChave.slice(0,2).forEach(pl => {
-    html += `<span class="glyph-badge" title="${pl}">${PLANETA_GLIFOS[pl]}</span>`;
-  });
-  if(p.signosChave.length){
-    html += `<span class="glyph-badge" title="${p.signosChave[0]}">${SIGNO_GLIFOS[p.signosChave[0]]}</span>`;
-  }
-  return html;
-}
-
-function render(){
-  const list = filterPlantas();
-  const grid = document.getElementById('grid');
-  const noResults = document.getElementById('noResults');
-  const count = document.getElementById('resultCount');
-
-  count.textContent = list.length === PLANTAS_DATA.length
-    ? `${PLANTAS_DATA.length} ervas no grimório`
-    : `${list.length} de ${PLANTAS_DATA.length} ervas encontradas`;
-
+function renderU(){
+  const list = filterErvasU();
+  const grid = document.getElementById('gridU');
+  const noResults = document.getElementById('noResultsU');
+  document.getElementById('resultCountU').textContent = list.length === UMBANDA_DATA.length ? `${UMBANDA_DATA.length} ervas no herbário do terreiro` : `${list.length} de ${UMBANDA_DATA.length} ervas encontradas`;
   grid.innerHTML = '';
-  if(list.length === 0){
-    noResults.style.display = 'block';
-    return;
-  }
+  if(list.length === 0){ noResults.style.display = 'block'; return; }
   noResults.style.display = 'none';
+  list.forEach(u => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const crossBadge = u.paracelsoRef ? `<span class="cross-badge" title="Também em Paracelso: ${u.paracelsoRef}">✦</span>` : '';
+    card.innerHTML = `
+      <div class="card-top">
+        <div>
+          <span class="cat-pill ${catClass(u.categoria)}">${u.categoria.split('(')[0].trim()}</span><br>
+          <div class="card-name">${u.nome}</div><div class="card-sci">${u.cientifico || ''}</div>
+        </div>
+        <div class="card-glyphs">${crossBadge}</div>
+      </div>
+      <div class="card-snippet">${u.indicacoes || ''}</div>
+      ${formaPillsHtml(u.formasDeUso, false)}
+      <div class="card-foot"><span>${u._orixasList.slice(0,2).join(', ')}</span><span>${u.corEnergetica || ''}</span></div>
+    `;
+    card.addEventListener('click', () => openModalUmbanda(u));
+    grid.appendChild(card);
+  });
+}
 
+function crossBoxForUmbanda(u){
+  if(!u.paracelsoRef) return '';
+  if(u.paracelsoTipo === 'citacao_direta'){
+    return `<div class="cross-box"><div class="cross-label"><span class="cross-glyph">✦</span> Citação direta a Paracelso</div><div class="cross-body">${u.paracelsoNota}</div></div>`;
+  }
+  if(u.paracelsoTipo === 'citada_no_texto'){
+    return `<div class="cross-box"><div class="cross-label"><span class="cross-glyph">✦</span> Também citada por Paracelso</div><div class="cross-body">${u.paracelsoNota}</div></div>`;
+  }
+  const p = paracelsoIdx[u.paracelsoRef];
+  if(!p) return '';
+  const tipoLabel = u.paracelsoTipo === 'exata' ? 'mesma planta' : 'planta relacionada';
+  return `<div class="cross-box"><div class="cross-label"><span class="cross-glyph">✦</span> Também no dicionário de Paracelso</div>
+    <div class="cross-body"><strong>${p.nome}</strong> <span style="font-style:italic; color: var(--ink-soft);">(${tipoLabel})</span> — planeta ${p.planeta || '—'}, signo ${p.signo || '—'}.<br>
+    ${u.paracelsoNota || ''}<br><span class="cross-link" data-goto-paracelso="${p.nome}">ver em Paracelso →</span></div></div>`;
+}
+
+function trabalhosQueUsamErva(nomeErva){
+  return TRABALHOS_DATA.filter(t => (t.passos||[]).some(p => (p.ervas||[]).includes(nomeErva)));
+}
+
+function trabalhoBoxForUmbanda(u){
+  const relacionados = trabalhosQueUsamErva(u.nome);
+  if(!relacionados.length) return '';
+  return `<div class="cross-box" style="border-color: var(--amber-deep); background: rgba(92,59,20,0.07);">
+    <div class="cross-label" style="color: var(--amber-deep);"><span class="cross-glyph">🜔</span> Usada em trabalhos e oferendas</div>
+    <div class="cross-body">${relacionados.map(t =>
+      `<div style="margin-bottom:0.4rem;"><strong>${t.nome}</strong> <span style="font-style:italic; color: var(--ink-soft);">(${t.tipo})</span>
+       <span class="cross-link" style="color: var(--amber-deep); border-bottom-color: var(--amber-deep); margin-top:0.15rem;" data-goto-trabalho="${t.id}">ver trabalho →</span></div>`
+    ).join('')}</div>
+  </div>`;
+}
+
+function openModalUmbanda(u){
+  history.replaceState(null,'','#umbanda/'+encodeURIComponent(u.nome));
+  const modal = document.getElementById('modalContent');
+  modal.className = 'modal umbanda-modal';
+  const crossBadge = u.paracelsoRef ? `<span class="tag"><span class="glyph">✦</span>Em Paracelso</span>` : '';
+  modal.innerHTML = `
+    <button class="modal-close" id="modalCloseBtn" aria-label="Fechar">✕</button>
+    <div class="modal-head">
+      <span class="cat-pill ${catClass(u.categoria)}">${u.categoria}</span>
+      <div class="modal-name">${u.nome}</div>
+      <div class="modal-sci">${u.cientifico || ''}</div>
+      <div class="modal-tags">${crossBadge}</div>
+      ${formaPillsHtml(u.formasDeUso, true)}
+    </div>
+    ${crossBoxForUmbanda(u)}
+    ${trabalhoBoxForUmbanda(u)}
+    <div class="modal-section">
+      <div class="section-label">Indicações ritualísticas<span class="rule"></span></div>
+      <div class="section-text">${u.indicacoes || '<span class="empty-note">Sem indicações registradas.</span>'}</div>
+    </div>
+    <div class="modal-section">
+      <div class="section-label oculto">Sinônimos populares<span class="rule"></span></div>
+      <div class="section-text">${u.sinonimos || '<span class="empty-note">Sem sinônimos registrados.</span>'}</div>
+    </div>
+    <div class="modal-meta-grid">
+      <div class="meta-item"><div class="meta-label">Ação (verbos)</div><div class="meta-value">${u.acoes || '—'}</div></div>
+      <div class="meta-item"><div class="meta-label">Cor energética</div><div class="meta-value">${u.corEnergetica || '—'}</div></div>
+      <div class="meta-item"><div class="meta-label">Orixás principais</div><div class="meta-value">${u.orixas || '—'}</div></div>
+    </div>
+  `;
+  openOverlay();
+  document.querySelectorAll('[data-goto-paracelso]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      const p = paracelsoIdx[e.currentTarget.dataset.gotoParacelso];
+      if(p){ closeModal(); document.querySelector('.tab-btn.paracelso').click(); setTimeout(() => openModalParacelso(p), 200); }
+    });
+  });
+  document.querySelectorAll('[data-goto-trabalho]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      const t = trabalhoIdx[e.currentTarget.dataset.gotoTrabalho];
+      if(t){ closeModal(); document.querySelector('.tab-btn.trabalhos').click(); setTimeout(() => openModalTrabalho(t), 200); }
+    });
+  });
+  document.querySelectorAll('[data-goto-preparo-forma]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      const forma = e.currentTarget.dataset.gotoPreparoForma;
+      closeModal();
+      document.querySelector('.tab-btn.preparo').click();
+      setTimeout(() => {
+        const ids = FORMA_TO_PREPARO_IDS[forma] || [];
+        if(ids.length && preparoIdx[ids[0]]) openModalPreparo(preparoIdx[ids[0]]);
+      }, 200);
+    });
+  });
+}
+
+function buildFilterChipsPrep(){
+  const wrap = document.getElementById('tipoPreparoFilters');
+  const tipos = [...new Set(PREPAROS_DATA.map(p => p.categoria))];
+  tipos.forEach(t => {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.textContent = t;
+    chip.addEventListener('click', () => { activeTiposPreparo.has(t) ? activeTiposPreparo.delete(t) : activeTiposPreparo.add(t); chip.classList.toggle('active'); renderPrep(); });
+    wrap.appendChild(chip);
+  });
+}
+
+function matchesQueryPrep(p, q){
+  if(!q) return true;
+  return [p.nome, p.categoria, p.resumo, p.modoDePreparo, p.indicadoPara, p.observacoes, (p.exemplosErvas||[]).join(' ')].join(' ').toLowerCase().includes(q.toLowerCase());
+}
+function filterPreparos(){
+  return PREPAROS_DATA.filter(p => {
+    if(!matchesQueryPrep(p, queryPrep)) return false;
+    if(activeTiposPreparo.size > 0 && !activeTiposPreparo.has(p.categoria)) return false;
+    return true;
+  });
+}
+
+function ervasQueUsamPreparo(preparoNome){
+  // localiza ervas da Umbanda cujo formasDeUso corresponda à categoria deste preparo
+  const formaCorrespondente = Object.keys(FORMA_TO_PREPARO_IDS).find(forma =>
+    FORMA_TO_PREPARO_IDS[forma].includes(preparoNome)
+  );
+  if(!formaCorrespondente) return [];
+  return UMBANDA_DATA.filter(u => (u.formasDeUso||[]).includes(formaCorrespondente));
+}
+
+function renderPrep(){
+  const list = filterPreparos();
+  const grid = document.getElementById('gridPrep');
+  const noResults = document.getElementById('noResultsPrep');
+  document.getElementById('resultCountPrep').textContent = list.length === PREPAROS_DATA.length ? `${PREPAROS_DATA.length} métodos de preparo` : `${list.length} de ${PREPAROS_DATA.length} métodos encontrados`;
+  grid.innerHTML = '';
+  if(list.length === 0){ noResults.style.display = 'block'; return; }
+  noResults.style.display = 'none';
   list.forEach(p => {
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
       <div class="card-top">
         <div>
+          <span class="cat-pill" style="background:rgba(92,58,82,0.14); color:var(--plum-deep);">${p.categoria}</span><br>
           <div class="card-name">${p.nome}</div>
-          <div class="card-sci">${p.cientifico || ''}</div>
         </div>
-        <div class="card-glyphs">${glyphBadgesFor(p)}</div>
       </div>
-      <div class="card-snippet">${snippetFor(p)}</div>
-      <div class="card-foot">
-        <span>${p.planeta || '—'}</span>
-        <span>${p.signo ? p.signo.split(/[,;]| ou /)[0] : ''}</span>
-      </div>
+      <div class="card-snippet">${p.resumo || ''}</div>
+      <div class="card-foot"><span>${p.tempo || ''}</span><span>${(p.exemplosErvas||[]).slice(0,2).join(', ')}</span></div>
     `;
-    card.addEventListener('click', () => openModal(p));
+    card.addEventListener('click', () => openModalPreparo(p));
     grid.appendChild(card);
   });
 }
 
-function tagsFor(p){
-  let html = '';
-  p.planetasChave.forEach(pl => {
-    html += `<span class="tag"><span class="glyph">${PLANETA_GLIFOS[pl]}</span>${pl}</span>`;
-  });
-  p.signosChave.forEach(s => {
-    html += `<span class="tag"><span class="glyph">${SIGNO_GLIFOS[s]}</span>${s}</span>`;
-  });
-  return html;
-}
-
-function openModal(p){
+function openModalPreparo(p){
+  history.replaceState(null,'','#preparo/'+encodeURIComponent(p.nome));
   const modal = document.getElementById('modalContent');
+  modal.className = 'modal preparo-modal';
+  const ervasRelacionadas = ervasQueUsamPreparo(p.id);
+  const ervasHtml = ervasRelacionadas.length ? `
+    <div class="modal-section">
+      <div class="section-label">Ervas indicadas para este preparo<span class="rule"></span></div>
+      <div class="section-text" style="display:flex; flex-wrap:wrap; gap:0.4rem;">
+        ${ervasRelacionadas.map(u => `<span class="tag" style="cursor:pointer;" data-goto-umbanda-erva="${u.nome}">${u.nome}</span>`).join('')}
+      </div>
+    </div>` : '';
   modal.innerHTML = `
     <button class="modal-close" id="modalCloseBtn" aria-label="Fechar">✕</button>
     <div class="modal-head">
+      <span class="cat-pill" style="background:rgba(92,58,82,0.14); color:var(--plum-deep);">${p.categoria}</span>
       <div class="modal-name">${p.nome}</div>
-      <div class="modal-sci">${p.cientifico || ''}</div>
-      <div class="modal-tags">${tagsFor(p) || '<span class="empty-note">Sem correspondências astrológicas registradas</span>'}</div>
+      <div class="modal-sci">${p.resumo || ''}</div>
     </div>
-
     <div class="modal-section">
-      <div class="section-label">Usos medicinais<span class="rule"></span></div>
-      <div class="section-text">${p.usosMedicinais ? p.usosMedicinais : '<span class="empty-note">Nenhum uso medicinal registrado nesta obra.</span>'}</div>
+      <div class="section-label">Modo de preparo<span class="rule"></span></div>
+      <div class="section-text">${p.modoDePreparo || '<span class="empty-note">Não detalhado.</span>'}</div>
     </div>
-
     <div class="modal-section">
-      <div class="section-label oculto">Botânica oculta<span class="rule"></span></div>
-      <div class="section-text">${p.ocultismo ? p.ocultismo : '<span class="empty-note">Virtudes mágicas desconhecidas pelo autor.</span>'}</div>
+      <div class="section-label oculto">Indicado para<span class="rule"></span></div>
+      <div class="section-text">${p.indicadoPara || '<span class="empty-note">—</span>'}</div>
     </div>
-
+    ${p.observacoes ? `
+    <div class="modal-section">
+      <div class="section-label oculto">Observações<span class="rule"></span></div>
+      <div class="section-text">${p.observacoes}</div>
+    </div>` : ''}
+    ${ervasHtml}
     <div class="modal-meta-grid">
-      <div class="meta-item">
-        <div class="meta-label">Planeta</div>
-        <div class="meta-value">${p.planeta || '—'}</div>
-      </div>
-      <div class="meta-item">
-        <div class="meta-label">Signo</div>
-        <div class="meta-value">${p.signo || '—'}</div>
-      </div>
-      <div class="meta-item">
-        <div class="meta-label">Natureza</div>
-        <div class="meta-value">${p.elemento || '—'}</div>
-      </div>
-      <div class="meta-item">
-        <div class="meta-label">Colheita</div>
-        <div class="meta-value">${p.colheita || '—'}</div>
-      </div>
+      <div class="meta-item"><div class="meta-label">Tempo</div><div class="meta-value">${p.tempo || '—'}</div></div>
     </div>
   `;
+  openOverlay();
+  document.querySelectorAll('[data-goto-umbanda-erva]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      const u = umbandaIdx[e.currentTarget.dataset.gotoUmbandaErva];
+      if(u){ closeModal(); document.querySelector('.tab-btn.umbanda').click(); setTimeout(() => openModalUmbanda(u), 200); }
+    });
+  });
+}
+
+function buildFilterChipsTrab(){
+  const tWrap = document.getElementById('tipoTrabFilters');
+  const tipos = [...new Set(TRABALHOS_DATA.map(t => t.tipo))];
+  tipos.forEach(t => {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.innerHTML = `<span class="glyph">${TIPO_GLIFOS[t]||''}</span><span>${t}</span>`;
+    chip.addEventListener('click', () => { activeTiposTrab.has(t) ? activeTiposTrab.delete(t) : activeTiposTrab.add(t); chip.classList.toggle('active'); renderTrab(); });
+    tWrap.appendChild(chip);
+  });
+
+  const fWrap = document.getElementById('fonteTrabFilters');
+  const fontes = ['Umbanda', 'Paracelso'];
+  fontes.forEach(f => {
+    if(!TRABALHOS_DATA.some(t => t.fonte.startsWith(f))) return;
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.textContent = f;
+    chip.addEventListener('click', () => { activeFontesTrab.has(f) ? activeFontesTrab.delete(f) : activeFontesTrab.add(f); chip.classList.toggle('active'); renderTrab(); });
+    fWrap.appendChild(chip);
+  });
+}
+
+function matchesQueryTrab(t, q){
+  if(!q) return true;
+  const ervasTexto = (t.passos||[]).flatMap(p => p.ervas||[]).join(' ');
+  return [t.nome, t.tipo, t.fonte, t.objetivo, t.observacoes, (t.orixas||[]).join(' '), ervasTexto].join(' ').toLowerCase().includes(q.toLowerCase());
+}
+function filterTrabalhos(){
+  return TRABALHOS_DATA.filter(t => {
+    if(!matchesQueryTrab(t, queryTrab)) return false;
+    if(activeTiposTrab.size > 0 && !activeTiposTrab.has(t.tipo)) return false;
+    if(activeFontesTrab.size > 0 && !([...activeFontesTrab].some(f => t.fonte.startsWith(f)))) return false;
+    return true;
+  });
+}
+
+function renderTrab(){
+  const list = filterTrabalhos();
+  const grid = document.getElementById('gridTrab');
+  const noResults = document.getElementById('noResultsTrab');
+  document.getElementById('resultCountTrab').textContent = list.length === TRABALHOS_DATA.length ? `${TRABALHOS_DATA.length} trabalhos e oferendas` : `${list.length} de ${TRABALHOS_DATA.length} encontrados`;
+  grid.innerHTML = '';
+  if(list.length === 0){ noResults.style.display = 'block'; return; }
+  noResults.style.display = 'none';
+  list.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const totalErvas = (t.passos||[]).flatMap(p => p.ervas||[]);
+    card.innerHTML = `
+      <div class="card-top">
+        <div>
+          <span class="cat-pill ${tipoClass(t.tipo)}">${TIPO_GLIFOS[t.tipo]||''} ${t.tipo}</span><br>
+          <div class="card-name">${t.nome}</div>
+          <div class="card-sci">${t.fonte || ''}</div>
+        </div>
+      </div>
+      <div class="card-snippet">${t.objetivo || ''}</div>
+      <div class="card-foot"><span>${(t.orixas||[]).slice(0,2).join(', ')}</span><span>${totalErvas.length} erva(s)</span></div>
+    `;
+    card.addEventListener('click', () => openModalTrabalho(t));
+    grid.appendChild(card);
+  });
+}
+
+function passoHtml(passo){
+  const ervasHtml = (passo.ervas && passo.ervas.length) ? `
+    <div class="passo-ervas">${passo.ervas.map(nome => {
+      const existe = umbandaIdx[nome];
+      return existe
+        ? `<span class="tag" style="cursor:pointer;" data-goto-umbanda-erva-trab="${nome}">${nome}</span>`
+        : `<span class="tag">${nome}</span>`;
+    }).join('')}</div>` : '';
+  return `
+    <div class="passo-item">
+      <div class="passo-titulo">${passo.dia}</div>
+      <div class="passo-desc">${passo.descricao || ''}</div>
+      ${ervasHtml}
+    </div>
+  `;
+}
+
+function openModalTrabalho(t){
+  history.replaceState(null,'','#trabalhos/'+encodeURIComponent(t.nome));
+  const modal = document.getElementById('modalContent');
+  modal.className = 'modal trabalhos-modal';
+  const orixasHtml = (t.orixas && t.orixas.length) ? `<div class="modal-tags">${t.orixas.map(o => `<span class="tag">${o}</span>`).join('')}</div>` : '';
+  modal.innerHTML = `
+    <button class="modal-close" id="modalCloseBtn" aria-label="Fechar">✕</button>
+    <div class="modal-head">
+      <span class="cat-pill ${tipoClass(t.tipo)}">${TIPO_GLIFOS[t.tipo]||''} ${t.tipo}</span>
+      <div class="modal-name">${t.nome}</div>
+      <div class="modal-sci">${t.fonte || ''}</div>
+      ${orixasHtml}
+    </div>
+    <div class="modal-section">
+      <div class="section-label">Objetivo<span class="rule"></span></div>
+      <div class="section-text">${t.objetivo || '<span class="empty-note">—</span>'}</div>
+    </div>
+    <div class="modal-section">
+      <div class="section-label oculto">Passos<span class="rule"></span></div>
+      <div class="passo-list">${(t.passos||[]).map(passoHtml).join('')}</div>
+    </div>
+    ${t.observacoes ? `
+    <div class="modal-section">
+      <div class="section-label oculto">Observações<span class="rule"></span></div>
+      <div class="section-text">${t.observacoes}</div>
+    </div>` : ''}
+  `;
+  openOverlay();
+  document.querySelectorAll('[data-goto-umbanda-erva-trab]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      const u = umbandaIdx[e.currentTarget.dataset.gotoUmbandaErvaTrab];
+      if(u){ closeModal(); document.querySelector('.tab-btn.umbanda').click(); setTimeout(() => openModalUmbanda(u), 200); }
+    });
+  });
+}
+
+function openOverlay(){
   document.getElementById('overlay').classList.add('open');
   document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
   document.body.style.overflow = 'hidden';
 }
+function closeModal(){ history.replaceState(null,'',location.pathname+location.search); document.getElementById('overlay').classList.remove('open'); document.body.style.overflow = ''; }
+document.getElementById('overlay').addEventListener('click', (e) => { if(e.target.id === 'overlay') closeModal(); });
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
 
-function closeModal(){
-  document.getElementById('overlay').classList.remove('open');
+let debounceTimerP, debounceTimerU;
+document.getElementById('searchInputP').addEventListener('input', (e) => { clearTimeout(debounceTimerP); debounceTimerP = setTimeout(() => { queryP = e.target.value; renderP(); }, 80); });
+document.getElementById('searchInputU').addEventListener('input', (e) => { clearTimeout(debounceTimerU); debounceTimerU = setTimeout(() => { queryU = e.target.value; renderU(); }, 80); });
+
+let debounceTimerPrep;
+document.getElementById('searchInputPrep').addEventListener('input', (e) => { clearTimeout(debounceTimerPrep); debounceTimerPrep = setTimeout(() => { queryPrep = e.target.value; renderPrep(); }, 80); });
+
+let debounceTimerTrab;
+document.getElementById('searchInputTrab').addEventListener('input', (e) => { clearTimeout(debounceTimerTrab); debounceTimerTrab = setTimeout(() => { queryTrab = e.target.value; renderTrab(); }, 80); });
+
+buildFilterChipsP();
+buildFilterChipsU();
+buildFormaFiltersU();
+buildFilterChipsPrep();
+buildFilterChipsTrab();
+renderP();
+renderU();
+renderPrep();
+renderTrab();
+// =====================================================================
+// DARK MODE
+// =====================================================================
+const DARK_KEY = 'botanica-dark';
+const themeToggleBtn = document.getElementById('themeToggle');
+function applyTheme(dark){
+  document.body.classList.toggle('dark', dark);
+  themeToggleBtn.textContent = dark ? '☀' : '🌙';
+  themeToggleBtn.title = dark ? 'Modo claro' : 'Modo escuro';
+}
+const savedDark = localStorage.getItem(DARK_KEY);
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+applyTheme(savedDark !== null ? savedDark === '1' : prefersDark);
+themeToggleBtn.addEventListener('click', () => {
+  const nowDark = document.body.classList.toggle('dark');
+  localStorage.setItem(DARK_KEY, nowDark ? '1' : '0');
+  applyTheme(nowDark);
+});
+
+// =====================================================================
+// BUSCA GLOBAL
+// =====================================================================
+const globalOverlay = document.getElementById('globalOverlay');
+const globalInput = document.getElementById('globalInput');
+const globalResults = document.getElementById('globalResults');
+const globalCloseBtn = document.getElementById('globalCloseBtn');
+const globalTrigger = document.getElementById('globalSearchTrigger');
+let globalFocusIdx = -1, globalItems = [];
+const GICONS = { paracelso:'⚗', umbanda:'🌿', preparo:'🜔', trabalhos:'🕯' };
+
+function openGlobal(){
+  globalOverlay.classList.add('open');
+  globalInput.value = ''; globalInput.focus();
+  renderGlobal('');
+  document.body.style.overflow = 'hidden';
+}
+function closeGlobal(){
+  globalOverlay.classList.remove('open');
   document.body.style.overflow = '';
+  globalFocusIdx = -1;
+}
+function renderGlobal(q){
+  if(!q || q.length < 2){
+    globalResults.innerHTML = '<div class="global-no-results">Digite pelo menos 2 letras para buscar em todas as abas…</div><div class="global-hint-bar"><span>↑↓ navegar</span><span>Enter abrir</span><span>Esc fechar</span></div>';
+    globalItems = []; return;
+  }
+  const ql = q.toLowerCase();
+  globalItems = [];
+  const mP = PLANTAS_DATA.filter(p=>[p.nome,p.cientifico,p.usosMedicinais,p.ocultismo,p.planeta].join(' ').toLowerCase().includes(ql)).slice(0,6);
+  const mU = UMBANDA_DATA.filter(u=>[u.nome,u.cientifico,u.indicacoes,u.acoes,u.orixas,u.sinonimos].join(' ').toLowerCase().includes(ql)).slice(0,6);
+  const mPrep = PREPAROS_DATA.filter(p=>[p.nome,p.categoria,p.resumo,p.modoDePreparo].join(' ').toLowerCase().includes(ql)).slice(0,4);
+  const mTrab = TRABALHOS_DATA.filter(t=>[t.nome,t.tipo,t.objetivo,(t.passos||[]).flatMap(p=>p.ervas||[]).join(' ')].join(' ').toLowerCase().includes(ql)).slice(0,4);
+  if(!mP.length&&!mU.length&&!mPrep.length&&!mTrab.length){
+    globalResults.innerHTML = '<div class="global-no-results">Nenhum resultado para "'+q+'"</div><div class="global-hint-bar"><span>↑↓ navegar</span><span>Enter abrir</span><span>Esc fechar</span></div>';
+    return;
+  }
+  let html = '';
+  function addGrp(label,items,type){
+    if(!items.length) return;
+    html += '<div class="global-group">'+GICONS[type]+' '+label+'</div>';
+    items.forEach(item => {
+      const sub = type==='paracelso'?(item.cientifico||''):type==='umbanda'?((item.orixas||'').split(',')[0]):type==='preparo'?(item.categoria||''):(item.tipo||'');
+      globalItems.push({type,item});
+      html += '<div class="global-item" data-idx="'+(globalItems.length-1)+'">'
+            + '<span class="global-item-icon">'+GICONS[type]+'</span>'
+            + '<span class="global-item-name">'+item.nome+'</span>'
+            + '<span class="global-item-sub">'+sub+'</span></div>';
+    });
+  }
+  addGrp('Paracelso — Botânica Oculta',mP,'paracelso');
+  addGrp('Umbanda — Rituais com Ervas',mU,'umbanda');
+  addGrp('Guia de Preparo',mPrep,'preparo');
+  addGrp('Trabalhos & Oferendas',mTrab,'trabalhos');
+  html += '<div class="global-hint-bar"><span>↑↓ navegar</span><span>Enter abrir</span><span>Esc fechar</span></div>';
+  globalResults.innerHTML = html;
+  globalFocusIdx = -1;
+  document.querySelectorAll('.global-item').forEach(el => {
+    el.addEventListener('click', ()=>openGlobalItem(parseInt(el.dataset.idx)));
+    el.addEventListener('mouseenter', ()=>{ document.querySelectorAll('.global-item').forEach(e=>e.classList.remove('focused')); el.classList.add('focused'); globalFocusIdx=parseInt(el.dataset.idx); });
+  });
+}
+function openGlobalItem(idx){
+  const {type,item} = globalItems[idx];
+  closeGlobal();
+  if(type==='paracelso'){ document.querySelector('.tab-btn.paracelso').click(); setTimeout(()=>openModalParacelso(item),200); }
+  else if(type==='umbanda'){ document.querySelector('.tab-btn.umbanda').click(); setTimeout(()=>openModalUmbanda(item),200); }
+  else if(type==='preparo'){ document.querySelector('.tab-btn.preparo').click(); setTimeout(()=>openModalPreparo(item),200); }
+  else if(type==='trabalhos'){ document.querySelector('.tab-btn.trabalhos').click(); setTimeout(()=>openModalTrabalho(item),200); }
+}
+globalTrigger.addEventListener('click', openGlobal);
+globalCloseBtn.addEventListener('click', closeGlobal);
+globalOverlay.addEventListener('click', e=>{ if(e.target===globalOverlay) closeGlobal(); });
+let gDebounce;
+globalInput.addEventListener('input', e=>{ clearTimeout(gDebounce); gDebounce=setTimeout(()=>renderGlobal(e.target.value),120); });
+globalInput.addEventListener('keydown', e=>{
+  const items = document.querySelectorAll('.global-item');
+  if(e.key==='ArrowDown'){ e.preventDefault(); globalFocusIdx=Math.min(globalFocusIdx+1,globalItems.length-1); items.forEach((el,i)=>el.classList.toggle('focused',i===globalFocusIdx)); items[globalFocusIdx]?.scrollIntoView({block:'nearest'}); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); globalFocusIdx=Math.max(globalFocusIdx-1,0); items.forEach((el,i)=>el.classList.toggle('focused',i===globalFocusIdx)); items[globalFocusIdx]?.scrollIntoView({block:'nearest'}); }
+  else if(e.key==='Enter'&&globalFocusIdx>=0){ openGlobalItem(globalFocusIdx); }
+});
+document.addEventListener('keydown', e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){ e.preventDefault(); globalOverlay.classList.contains('open')?closeGlobal():openGlobal(); }
+  if(e.key==='Escape'&&globalOverlay.classList.contains('open')) closeGlobal();
+});
+
+// =====================================================================
+// URL HASH
+// =====================================================================
+function parseHash(){
+  const h = decodeURIComponent(location.hash);
+  const m = h.match(/^#(paracelso|umbanda|preparo|trabalhos)\/(.+)$/);
+  if(!m) return null;
+  return {view:m[1],nome:m[2]};
+}
+function navigateToHash(){
+  const parsed = parseHash();
+  if(!parsed) return;
+  const {view,nome} = parsed;
+  document.querySelector('.tab-btn.'+view)?.click();
+  setTimeout(()=>{
+    if(view==='paracelso'){ const it=PLANTAS_DATA.find(p=>p.nome===nome); if(it) openModalParacelso(it); }
+    else if(view==='umbanda'){ const it=UMBANDA_DATA.find(u=>u.nome===nome); if(it) openModalUmbanda(it); }
+    else if(view==='preparo'){ const it=PREPAROS_DATA.find(p=>p.nome===nome); if(it) openModalPreparo(it); }
+    else if(view==='trabalhos'){ const it=TRABALHOS_DATA.find(t=>t.nome===nome); if(it) openModalTrabalho(it); }
+  },200);
+}
+if(location.hash){
+  const _hi=setInterval(()=>{ if(document.querySelector('#gridP .card')){ clearInterval(_hi); setTimeout(navigateToHash,100); } },80);
+  setTimeout(()=>clearInterval(_hi),3000);
+}
+window.addEventListener('hashchange', navigateToHash);
+
+// =====================================================================
+// NOTAS PESSOAIS
+// =====================================================================
+const NOTA_PFX = 'botanica-nota-';
+function notaKey(view,nome){ return NOTA_PFX+view+'-'+nome; }
+function getNota(view,nome){ return localStorage.getItem(notaKey(view,nome))||''; }
+function saveNota(view,nome,text){ text.trim()?localStorage.setItem(notaKey(view,nome),text):localStorage.removeItem(notaKey(view,nome)); }
+
+function notaHtml(view,nome){
+  const nota=getNota(view,nome), has=!!nota;
+  return '<div class="nota-section">'
+    +'<button class="nota-toggle'+(has?' tem-nota':'')+'" id="notaToggleBtn">✏ '+(has?'Minha nota':'Adicionar nota pessoal')+'</button>'
+    +'<div class="nota-editor" id="notaEditor" style="display:none;">'
+    +'<textarea class="nota-area" id="notaArea" placeholder="Suas observações pessoais…">'+nota+'</textarea>'
+    +'<div class="nota-actions">'
+    +'<button class="nota-save" id="notaSaveBtn">Salvar</button>'
+    +(has?'<button class="nota-del" id="notaDelBtn">Apagar</button>':'')
+    +'<span class="nota-feedback" id="notaFeedback">Salvo ✓</span>'
+    +'</div></div></div>';
 }
 
-document.getElementById('overlay').addEventListener('click', (e) => {
-  if(e.target.id === 'overlay') closeModal();
-});
-document.addEventListener('keydown', (e) => {
-  if(e.key === 'Escape') closeModal();
-});
+function attachNota(view,nome){
+  const tog=document.getElementById('notaToggleBtn');
+  const ed=document.getElementById('notaEditor');
+  const area=document.getElementById('notaArea');
+  const sv=document.getElementById('notaSaveBtn');
+  const dl=document.getElementById('notaDelBtn');
+  const fb=document.getElementById('notaFeedback');
+  if(!tog) return;
+  tog.addEventListener('click',()=>{ const open=ed.style.display==='block'; ed.style.display=open?'none':'block'; if(!open) area.focus(); });
+  if(sv) sv.addEventListener('click',()=>{ saveNota(view,nome,area.value); tog.classList.toggle('tem-nota',!!area.value.trim()); tog.textContent='✏ '+(area.value.trim()?'Minha nota':'Adicionar nota pessoal'); fb.classList.add('show'); setTimeout(()=>fb.classList.remove('show'),1800); renderNotaDots(); });
+  if(dl) dl.addEventListener('click',()=>{ if(confirm('Apagar nota?')){ saveNota(view,nome,''); area.value=''; tog.classList.remove('tem-nota'); tog.textContent='✏ Adicionar nota pessoal'; ed.style.display='none'; renderNotaDots(); } });
+}
 
-let debounceTimer;
-document.getElementById('searchInput').addEventListener('input', (e) => {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(() => {
-    query = e.target.value;
-    render();
-  }, 80);
-});
+function renderNotaDots(){
+  document.querySelectorAll('.nota-dot').forEach(d=>d.remove());
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(!k||!k.startsWith(NOTA_PFX)) continue;
+    const rest=k.replace(NOTA_PFX,'');
+    const m=rest.match(/^(paracelso|umbanda|preparo|trabalhos)-(.+)$/);
+    if(!m) continue;
+    const [,view,nome]=m;
+    const gridId=view==='paracelso'?'gridP':view==='umbanda'?'gridU':view==='preparo'?'gridPrep':'gridTrab';
+    const grid=document.getElementById(gridId);
+    if(!grid) continue;
+    grid.querySelectorAll('.card').forEach(card=>{
+      const ne=card.querySelector('.card-name');
+      if(ne&&ne.textContent.trim()===nome){
+        const gl=card.querySelector('.card-glyphs');
+        if(gl&&!gl.querySelector('.nota-dot')){ const dot=document.createElement('span'); dot.className='nota-dot'; dot.title='Você tem uma nota'; gl.appendChild(dot); }
+      }
+    });
+  }
+}
 
-buildFilterChips();
-render();
+// Injetar nota em todo modal que abrir via MutationObserver
+const _mObs=new MutationObserver(()=>{
+  const modal=document.getElementById('modalContent');
+  if(!modal||!document.querySelector('.overlay.open')||modal.querySelector('.nota-section')) return;
+  const nameEl=modal.querySelector('.modal-name');
+  if(!nameEl) return;
+  const nome=nameEl.textContent.trim();
+  const mc=modal.className;
+  const view=mc.includes('umbanda')?'umbanda':mc.includes('preparo')?'preparo':mc.includes('trabalhos')?'trabalhos':'paracelso';
+  modal.insertAdjacentHTML('beforeend',notaHtml(view,nome));
+  attachNota(view,nome);
+});
+_mObs.observe(document.getElementById('modalContent'),{childList:true});
+
+setTimeout(renderNotaDots,800);
+document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>setTimeout(renderNotaDots,400)));
+
 </script>
 
 </body>
